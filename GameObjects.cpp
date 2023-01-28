@@ -3,17 +3,23 @@
 
 using namespace std;
 
+const int screenHeight = 40;
+const int screenWidth = 120;
+
 class GameObject {
     public:
         virtual ~GameObject() {ResetColor();}
-        GameObject(char* sprite_, int posY_, int posX_) : 
+        GameObject(char* sprite_, int posY_, int posX_, int height_, int width_) : 
             sprite(sprite_),
             posY(posY_),
-            posX(posX_)
-        {SetColor();}
+            posX(posX_),
+            height(height_),
+            width(width_)
+        {}
         virtual void SetColor() {printf("\033[039m");}
         virtual void ResetColor() {printf("\033[039m");}
         virtual void PutSprite() {
+            SetColor();
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
                     printf("\033[%d;%dH", posY + i, posX + j);
@@ -22,8 +28,8 @@ class GameObject {
                 }
             }
         }
-        static const int height = 3;
-        static const int width = 3;
+        int height;
+        int width;
         int posY;
         int posX;
         char *sprite;
@@ -31,19 +37,35 @@ class GameObject {
 
 class Player : public GameObject {
     public:
-        Player(char *playerSprite, int posY_, int posX_): 
-            GameObject(playerSprite, posY_, posX_) 
-        {SetColor();}
+        Player(char *playerSprite, int posY_, int posX_, int height_, int width_): 
+            GameObject(playerSprite, posY_, posX_, height_, width_) 
+        {}
         virtual void SetColor() {printf("\033[32m");}
-        static const int height = 2;
-        static const int width = 2;
-        char *sprite;
+};
+
+class Terrain : public GameObject {
+    public:
+        Terrain(int posY_, int posX_, int height_, int width_):
+            GameObject(NULL, posY_, posX_, height_, width_)
+        {}
+        virtual void SetColor() {printf("\033[30m");}
+        virtual void PutSprite() {
+            SetColor();
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    printf("\033[%d;%dH", posY + i, posX + j);
+                    cout << "\u2588";
+                }
+            }
+        }
 };
 
 int main() {
     system("clear");
-    char playerSprite[] = " #  # ";
-    Player player(playerSprite, 10, 10);
+    char playerSprite[] = "##";
+    Player player(playerSprite, 10, 10, 2, 1);
+    Terrain ground(screenHeight * 0.75, 0, screenHeight * 0.25, screenWidth);
     player.PutSprite();
+    ground.PutSprite();
     return 0;
 }
