@@ -32,13 +32,14 @@ class GameObject {
         int width;
         int posY;
         int posX;
+        int id;
         char *sprite;
 };
 
 class Player : public GameObject {
     public:
-        Player(char *playerSprite, int posY_, int posX_, int height_, int width_): 
-            GameObject(playerSprite, posY_, posX_, height_, width_) 
+        Player(int posY_, int posX_): 
+            GameObject((char*) "##", posY_, posX_, 2, 1) 
         {}
         virtual void SetColor() {printf("\033[32m");}
 };
@@ -60,12 +61,26 @@ class Terrain : public GameObject {
         }
 };
 
-int main() {
-    system("clear");
-    char playerSprite[] = "##";
-    Player player(playerSprite, 10, 10, 2, 1);
-    Terrain ground(screenHeight * 0.75, 0, screenHeight * 0.25, screenWidth);
-    player.PutSprite();
-    ground.PutSprite();
-    return 0;
-}
+class GameMaster {
+    public:
+        GameMaster() :
+            numberOfObjects(0)
+        {}
+        void AddObject(GameObject* newObject) {object[numberOfObjects++] = newObject;}
+        void Display() {
+            system("clear");
+            for (int i = 0; i < numberOfObjects; i++) 
+            {object[i]->PutSprite();}
+        }
+        unsigned int numberOfObjects;
+        GameObject* object[25];
+};
+
+// int main() {
+//     system("clear");
+//     char playerSprite[] = "##";
+//     Player player(playerSprite, 10, 10, 2, 1);
+//     Terrain ground(screenHeight * 0.75, 0, screenHeight * 0.25, screenWidth);
+    
+//     return 0;
+// }
