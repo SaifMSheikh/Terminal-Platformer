@@ -9,10 +9,10 @@ const int screenWidth = 120;
 class GameObject {
     public:
         virtual ~GameObject() {ResetColor();}
-        GameObject(char* sprite_, int posY_, int posX_, int height_, int width_) : 
+        GameObject(char* sprite_, int y_, int x_, int height_, int width_) : 
             sprite(sprite_),
-            posY(posY_),
-            posX(posX_),
+            y(y_),
+            x(x_),
             height(height_),
             width(width_)
         {}
@@ -22,42 +22,44 @@ class GameObject {
             SetColor();
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
-                    printf("\033[%d;%dH", posY + i, posX + j);
+                    printf("\033[%d;%dH", y + i, x + j);
                     if (*(sprite + (i * width) + j) == '#') {cout << "\u2588";}
                     else {cout << *(sprite + (i * width) + j);}
                 }
             }
+            ResetColor();
         }
         int height;
         int width;
-        int posY;
-        int posX;
+        int y;
+        int x;
         int id;
         char *sprite;
 };
 
 class Player : public GameObject {
     public:
-        Player(int posY_, int posX_): 
-            GameObject((char*) "##", posY_, posX_, 2, 1) 
+        Player(int y_, int x_): 
+            GameObject((char*) "##", y_, x_, 2, 1) 
         {}
         virtual void SetColor() {printf("\033[32m");}
 };
 
 class Terrain : public GameObject {
     public:
-        Terrain(int posY_, int posX_, int height_, int width_):
-            GameObject(NULL, posY_, posX_, height_, width_)
+        Terrain(int y_, int x_, int height_, int width_):
+            GameObject(NULL, y_, x_, height_, width_)
         {}
         virtual void SetColor() {printf("\033[30m");}
         virtual void PutSprite() {
             SetColor();
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
-                    printf("\033[%d;%dH", posY + i, posX + j);
+                    printf("\033[%d;%dH", y + i, x + j);
                     cout << "\u2588";
                 }
             }
+            ResetColor();
         }
 };
 
@@ -71,6 +73,24 @@ class GameMaster {
             system("clear");
             for (int i = 0; i < numberOfObjects; i++) 
             {object[i]->PutSprite();}
+        }
+        bool AreColliding(GameObject* A, GameObject* B) {
+            // Colliding If Same Position
+            if (A->y == B->y && A->x == B->x) {return true;}
+            bool yOverlap = false;
+            // Test Height
+            if (A->y > B->y) {
+                if (B->height > (A->y - B->y)) {yOverlap = true;}
+            }
+            if (A->height > (B->y - A->y)) {yOverlap = true;}
+            if (!yOverlap) {return false;}
+            // Test Width
+            if (A->x > B->x) {
+                if (B->width > (A->x - B->x)) {return true;}
+            }
+            if (A->width > (B->x - A->x)) {return true;}
+            // Not Colliding
+            return false;
         }
         unsigned int numberOfObjects;
         GameObject* object[25];
