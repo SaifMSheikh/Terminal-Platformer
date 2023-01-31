@@ -1,4 +1,6 @@
+#include <chrono>
 #include <iostream>
+#include <future>
 #include <thread>
 
 using namespace std;
@@ -11,9 +13,14 @@ class Command {
 
 class InputHandler {
     public:
-        InputHandler() {system("stty raw");}
-        ~InputHandler() {system("stty cooked");}
-        void HandleInput() {input = getchar();}
+        InputHandler() : input('-') {}
+        ~InputHandler() {}
+        static char GetInput() {
+            system("stty raw");
+            char inChar = getchar();
+            system("stty cooked"); 
+            return inChar;   
+        }
         char input;
 };
 
