@@ -22,7 +22,7 @@ class GameObject {
             SetColor();
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
-                    printf("\033[%d;%dH", y + i, x + j);
+                    printf("\033[%d;%dH", (int) y + i, (int) x + j);
                     if (*(sprite + (i * width) + j) == '#') {cout << "\u2588";}
                     else {cout << *(sprite + (i * width) + j);}
                 }
@@ -31,16 +31,25 @@ class GameObject {
         }
         int height;
         int width;
-        int y;
-        int x;
-        int id;
+        float y;
+        float x;
+        unsigned int id;
         char *sprite;
 };
 
-class Player : public GameObject {
+class Actor : public GameObject {
+    public:
+        Actor(char * sprite_, int y_, int x_, int height, int width):
+            GameObject(sprite_, y_, x_, height, width)
+        {}
+        void Move(bool right) {if (right) {x++;} else {x--;}}
+        void Jump() {}
+};
+
+class Player : public Actor {
     public:
         Player(int y_, int x_): 
-            GameObject((char*) "##", y_, x_, 2, 1) 
+            Actor((char*) "##", y_, x_, 2, 1) 
         {}
         virtual void SetColor() {printf("\033[32m");}
 };
@@ -55,7 +64,7 @@ class Terrain : public GameObject {
             SetColor();
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
-                    printf("\033[%d;%dH", y + i, x + j);
+                    printf("\033[%d;%dH", (int) (y + i), (int) (x + j));
                     cout << "\u2588";
                 }
             }
@@ -80,27 +89,18 @@ class GameMaster {
             bool yOverlap = false;
             // Test Height
             if (A->y > B->y) {
-                if (B->height > (A->y - B->y)) {yOverlap = true;}
+                if (B->height >= (A->y - B->y)) {yOverlap = true;}
             }
-            if (A->height > (B->y - A->y)) {yOverlap = true;}
+            if (A->height >= (B->y - A->y)) {yOverlap = true;}
             if (!yOverlap) {return false;}
             // Test Width
             if (A->x > B->x) {
-                if (B->width > (A->x - B->x)) {return true;}
+                if (B->width >= (A->x - B->x)) {return true;}
             }
-            if (A->width > (B->x - A->x)) {return true;}
+            if (A->width >= (B->x - A->x)) {return true;}
             // Not Colliding
             return false;
         }
         unsigned int numberOfObjects;
         GameObject* object[25];
 };
-
-// int main() {
-//     system("clear");
-//     char playerSprite[] = "##";
-//     Player player(playerSprite, 10, 10, 2, 1);
-//     Terrain ground(screenHeight * 0.75, 0, screenHeight * 0.25, screenWidth);
-    
-//     return 0;
-// }
