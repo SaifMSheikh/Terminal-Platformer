@@ -83,24 +83,50 @@ class GameMaster {
             for (int i = 0; i < numberOfObjects; i++) 
             {object[i]->PutSprite();}
         }
-        bool AreColliding(GameObject* A, GameObject* B) {
-            // Colliding If Same Position
-            if (A->y == B->y && A->x == B->x) {return true;}
-            bool yOverlap = false;
-            // Test Height
-            if (A->y > B->y) {
-                if (B->height >= (A->y - B->y)) {yOverlap = true;}
+        void HandleCollision(GameObject* A, GameObject* B) {
+            switch (CheckCollision(A, B)) {
+                case 0:     // Not Colliding
+                    cout << "NOT COLLIDING"; 
+                    break;
+                case 1:     // Sprites Overlap
+                    cout << "OVERLAP";
+                    break;
+                case 2:     // A Below B
+                    cout << "A ABOVE B";
+                    break;
+                case 3:     // A Above B
+                    cout << "A BELOW B";
+                    break;
+                case 4:     // B A
+                    cout << "A LEFT B";
+                    break;
+                case 5:     // A B
+                    cout << "A RIGHT OF B";
+                    break;
             }
-            if (A->height >= (B->y - A->y)) {yOverlap = true;}
-            if (!yOverlap) {return false;}
-            // Test Width
-            if (A->x > B->x) {
-                if (B->width >= (A->x - B->x)) {return true;}
-            }
-            if (A->width >= (B->x - A->x)) {return true;}
-            // Not Colliding
-            return false;
         }
+        int CheckCollision(GameObject* A, GameObject* B) {
+            bool xOverlap = false;
+            bool yOverlap = false;
+            for (int x = A->x; x < (A->x + A->width); x++) {
+                if (x >= B->x && x < (B->x + B->width)) {xOverlap = true; cout << 'X';}
+            }
+            for (int y = A->y; y < (A->y + A->height); y++) {
+                if (y >= B->y && y < (B->y + B->height)) {yOverlap = true; cout << 'Y';}
+            }
+            if (xOverlap && yOverlap) {return 1;}                               // Overlap
+            if (xOverlap) {
+                if ((A->y + A->height) == B->y) {return 2;}                 // A Above B
+                if (A->y == (B->y + B->height)) {return 3;}                 // A Below B
+            }
+            if (yOverlap) {
+                if ((A->x + A->width) == B->x) {return 4;}                 // A Left B
+                if (A->x == (B->x + B->width)) {return 5;}                 // A Right B
+            }
+            return 0;
+        }
+                                                                     
+                
         unsigned int numberOfObjects;
         GameObject* object[25];
 };

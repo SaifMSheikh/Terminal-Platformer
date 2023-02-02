@@ -14,45 +14,48 @@ int main() {
 
     // Create Game Objects
     GameMaster game;
-    Player* player = new Player(10, 10);
+    Player* player = new Player(25, 25);
     Terrain* ground = new Terrain((int) screenHeight * 0.75, 0, (int) screenHeight * 0.25, screenWidth);
-    Terrain* obstacle = new Terrain(ground->y - 5, 100, 5, 5);
+    Terrain* obstacle = new Terrain(20, 20, 5, 5);
     game.AddObject(player);
     game.AddObject(ground);
     game.AddObject(obstacle);
 
+    game.Display();
+    game.HandleCollision(player, obstacle);
+
     // Game Loop
-    bool stop = false;
-    while (!stop) {
-        // Display Frame
-        game.Display();
+    // bool stop = false;
+    // while (!stop) {
+    //     // Display Frame
+    //     game.Display();
 
-        // Update Game Clock
-        timeB = chrono::system_clock::now();
-        chrono::duration <float> deltaTime = timeB - timeA;
-        timeA = timeB;
-        float elapsedTime = deltaTime.count();
+    //     // Update Game Clock
+    //     timeB = chrono::system_clock::now();
+    //     chrono::duration <float> deltaTime = timeB - timeA;
+    //     timeA = timeB;
+    //     float elapsedTime = deltaTime.count();
 
-        // Test
-        while (!game.AreColliding(player, ground)) {player->y++;}
-        Command* command = inputHandler.HandleInput();
-        if (command) {
-            if (inputHandler.input == 'q') {stop = true;}
-            else {command->Execute(player);}
-            inputHandler.input = '-';
-        }
+    //     // Test
+    //     while (!game.AreColliding(player, ground)) {player->y++;}
+    //     Command* command = inputHandler.HandleInput();
+    //     if (command) {
+    //         if (inputHandler.input == 'q') {stop = true;}
+    //         else {command->Execute(player);}
+    //         inputHandler.input = '-';
+    //     }
 
-        // Get Input
-        if (getInput.wait_for(timeout) == future_status::ready) {
-            inputHandler.input = getInput.get();
+    //     // Get Input
+    //     if (getInput.wait_for(timeout) == future_status::ready) {
+    //         inputHandler.input = getInput.get();
 
-            Command* command = inputHandler.HandleInput();
-            if (command) {command->Execute(player);}
+    //         Command* command = inputHandler.HandleInput();
+    //         if (command) {command->Execute(player);}
 
-            getInput = async(inputHandler.GetInput);
-            if (inputHandler.input == 'q') {stop = true;}
-        }
-    }
+    //         getInput = async(inputHandler.GetInput);
+    //         if (inputHandler.input == 'q') {stop = true;}
+    //     }
+    // }
 
     return 0;
 }
